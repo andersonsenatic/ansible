@@ -17,7 +17,7 @@
 
     - name: Copia o arquivo atualizado.
       ansible.builtin.copy:
-        src: file/srv-k3s/sudoers  # Caminho para o seu arquivo sudoers local
+        src: files/srv-k3s/sudoers  # Caminho para o seu arquivo sudoers local
         dest: /etc/sudoers.new
         owner: root
         group: root
