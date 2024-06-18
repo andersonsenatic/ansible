@@ -1,5 +1,5 @@
 ---
-- name: Atualização dos Sudoers 
+- name: Atualização dos Sudoers
   hosts: all
   become: yes
   gather_facts: no
@@ -7,26 +7,38 @@
   tasks:
     - name: Backup do Sudoers
       ansible.builtin.copy:
-        src: /etc/sudoers.bkp
-        dest: /etc/sudoers
+        src: /etc/sudoers
+        dest: /etc/sudoers.bkp
         owner: root
         group: root
         mode: '0440'
         remote_src: yes
       become: yes
 
-    - name: Copia o arquivo atualizado. 
+    - name: Copia o arquivo atualizado.
       ansible.builtin.copy:
-        src: file/srv-k3s/sudoers  # Path to your local sudoers file
+        src: file/srv-k3s/sudoers  # Caminho para o seu arquivo sudoers local
         dest: /etc/sudoers.new
         owner: root
         group: root
         mode: '0440'
       become: yes
-      validate: 'visudo -cf %s'
 
-    - name: Renomea o arquivo sudoers.new 
+    - name: Valida o novo arquivo sudoers
+      ansible.builtin.command:
+        cmd: visudo -cf /etc/sudoers.new
+      register: validation_result
+      become: yes
+      ignore_errors: true
+
+    - name: Renomeia o arquivo sudoers.new se for válido
       ansible.builtin.command:
         cmd: mv /etc/sudoers.new /etc/sudoers
+      when: validation_result.rc == 0
       become: yes
+
+    - name: Exibe erros de validação
+      ansible.builtin.debug:
+        msg: "{{ validation_result.stderr }}"
+      when: validation_result.rc != 0
 
