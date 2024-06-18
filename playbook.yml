@@ -1,0 +1,14 @@
+---
+- name: Check Disk Space on Remote Hosts
+  hosts: all
+  become: yes  # Use 'become' to execute as root
+
+  tasks:
+    - name: Check disk space using df command
+      ansible.builtin.shell: df -h
+      register: disk_space
+
+    - name: Print the disk space
+      ansible.builtin.debug:
+        msg: "{{ disk_space.stdout_lines }}"
+
