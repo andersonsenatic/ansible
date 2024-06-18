@@ -1,0 +1,32 @@
+---
+- name: Atualização dos Sudoers 
+  hosts: all
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: Backup do Sudoers
+      ansible.builtin.copy:
+        src: /etc/sudoers.bkp
+        dest: /etc/sudoers
+        owner: root
+        group: root
+        mode: '0440'
+        remote_src: yes
+      become: yes
+
+    - name: Copia o arquivo atualizado. 
+      ansible.builtin.copy:
+        src: file/srv-k3s/sudoers  # Path to your local sudoers file
+        dest: /etc/sudoers.new
+        owner: root
+        group: root
+        mode: '0440'
+      become: yes
+      validate: 'visudo -cf %s'
+
+    - name: Renomea o arquivo sudoers.new 
+      ansible.builtin.command:
+        cmd: mv /etc/sudoers.new /etc/sudoers
+      become: yes
+
