@@ -1,0 +1,20 @@
+---
+- name: Criar usuário no OpenLDAP
+  hosts: all
+
+  tasks:
+    - name: "Criar nova entrada de usuário no LDAP"
+      community.general.ldap_entry:
+        dn: "uid={{ ldap_username }},ou=users,dc=senati,dc=local"
+        objectClass:
+          - inetOrgPerson
+          - top
+        attributes:
+          sn: "{{ ldap_username }}"
+          cn: "{{ ldap_username }}"
+          userPassword: "{{ ldap_password }}"
+        bind_dn: "cn=admin,dc=senati,dc=local"
+        bind_pw: "{{ admin_pass }}"
+        server_uri: "ldap://10.43.184.19"
+        state: present
+
