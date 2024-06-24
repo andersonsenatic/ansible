@@ -1,0 +1,33 @@
+---
+- name: Exemplo de Playbook usando ansible.posix
+  hosts: all
+  become: yes
+  tasks:
+    - name: Garantir que o cron está instalado
+      ansible.builtin.package:
+        name: cron
+        state: present
+
+    - name: Adicionar uma tarefa cron para backup diário
+      ansible.posix.cron:
+        name: "Backup diário"
+        user: "root"
+        job: "tar -czf /root/diario.tar.gz /etc/passwd"
+        minute: "0"
+        hour: "2"
+        day: "*"
+
+    - name: Garantir que o serviço NTP está rodando
+      ansible.posix.service:
+        name: ntp
+        state: started
+        enabled: yes
+
+    - name: Configurar permissões de um diretório
+      ansible.posix.file:
+        path: /some/important/directory
+        owner: root
+        group: root
+        mode: '0755'
+        state: directory
+
